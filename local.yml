@@ -1,0 +1,4 @@
+database_url: "mongodb://127.0.0.1:27017"
+database_name: "roava"
+pulsar_url: "pulsar://127.0.0.1:6650"
+pulsar_cert: ""
