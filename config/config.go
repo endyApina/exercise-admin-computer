@@ -7,6 +7,8 @@ import (
 )
 
 type Secrets struct {
+	ServiceName      string `mapstructure:"service_name"`
+	ServicePort      string `mapstructure:"service_port"`
 	DatabaseHost     string `mapstructure:"database_host"`
 	DatabasePort     string `mapstructure:"database_port"`
 	DatabaseName     string `mapstructure:"database_name"`

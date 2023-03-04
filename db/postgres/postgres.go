@@ -12,19 +12,19 @@ import (
 	"gorm.io/gorm"
 )
 
-func New(secrets *config.Secrets) (db.DataStore, *gorm.DB, error) {
+func New(secrets *config.Secrets) (db.DataStore, error) {
 	url := fmt.Sprintf("host=%s user=postgres password=%s dbname=%s port=%s", secrets.DatabaseHost, secrets.DatabasePassword, secrets.DatabaseName, secrets.DatabasePort)
 
 	db, err := gorm.Open(postgres.Open(url), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
-		return nil, nil, err
+		return nil, err
 	}
 
 	db.AutoMigrate(models.Computer{})
 	return &postgresStore{
 		postgresClient: db,
-	}, db, nil
+	}, nil
 }
 
 var _ db.ComputerStore = &postgresStore{}

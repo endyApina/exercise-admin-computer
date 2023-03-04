@@ -1,4 +1,6 @@
-database_host: "http://localhost"
+service_name: computer-records
+service_port: "9119"
+database_host: "localhost"
 database_port: "5432"
 database_name: "greenbone"
 database_password: "pappi"
