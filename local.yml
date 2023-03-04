@@ -1,4 +1,6 @@
-database_url: "mongodb://127.0.0.1:27017"
-database_name: "roava"
+database_host: "http://localhost"
+database_port: "5432"
+database_name: "greenbone"
+database_password: "pappi"
 pulsar_url: "pulsar://127.0.0.1:6650"
 pulsar_cert: ""

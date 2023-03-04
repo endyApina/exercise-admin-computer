@@ -7,11 +7,13 @@ import (
 )
 
 type Secrets struct {
-	DatabaseURL  string `mapstructure:"database_url"`
-	DatabaseName string `mapstructure:"database_name"`
-	PulsarURL    string `mapstructure:"pulsar_url"`
-	PulsarCert   string `mapstructure:"pulsar_cert"`
-	HTTPPort     string `mapstructure:"HTTP_PORT"`
+	DatabaseHost     string `mapstructure:"database_host"`
+	DatabasePort     string `mapstructure:"database_port"`
+	DatabaseName     string `mapstructure:"database_name"`
+	DatabasePassword string `mapstructure:"database_password"`
+	PulsarURL        string `mapstructure:"pulsar_url"`
+	PulsarCert       string `mapstructure:"pulsar_cert"`
+	HTTPPort         string `mapstructure:"HTTP_PORT"`
 }
 
 // LoadSecrets loads up secrets from the .env file once
