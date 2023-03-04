@@ -24,3 +24,11 @@ database_password: "PASSWORD"
 ```
 
 NOTE: `CREATE POSTGRES DATABASE`
+
+To build the service run
+
+```sh
+go build -o admin-computer
+```
+
+Afterwards the service can be started with `./admin-computer`.

@@ -9,10 +9,10 @@ type DataStore interface {
 type ComputerStore interface {
 	CreateComputer(computerData *models.Computer) error
 	GetComputerByID(computerId string) (*models.Computer, error)
-	GetComputerByEmployeeName(employeeName string) (*models.Computer, error)
+	GetComputersByEmployeeName(employeeName string) ([]*models.Computer, error)
 	GetAllComputers() ([]*models.Computer, error)
 	UpdateComputer(computerData *models.Computer) error
 	DeleteComputer(cumputerId string) (*models.Computer, error)
-	UnAssignComputer(computerId, employeeId string) error
-	UpdateComputerAllocation(computerId, employeeId string) error
+	UnAssignComputer(computerId, employeeAbbreviation string) error
+	UpdateComputerAllocation(computerId, employeeAbbreviation string) error
 }

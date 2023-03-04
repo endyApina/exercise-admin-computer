@@ -10,6 +10,7 @@ import (
 
 	"github.com/endyApina/exercise-admin-computer/config"
 	"github.com/endyApina/exercise-admin-computer/db/postgres"
+	"github.com/endyApina/exercise-admin-computer/lib/idgenerator"
 	httpServer "github.com/endyApina/exercise-admin-computer/server/http"
 )
 
@@ -28,7 +29,8 @@ func main() {
 		log.Fatal("error connecting to database")
 	}
 
-	httpRouter := httpServer.MountServer(store)
+	idGeneratorDependency := idgenerator.New()
+	httpRouter := httpServer.MountServer(store, idGeneratorDependency)
 
 	interruptHandler := make(chan os.Signal, 1)
 	signal.Notify(interruptHandler, syscall.SIGTERM, syscall.SIGINT)
