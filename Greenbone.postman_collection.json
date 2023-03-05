@@ -1,0 +1,279 @@
+{
+	"info": {
+		"_postman_id": "017ccbc0-1bed-40b7-9dab-010cb33e7407",
+		"name": "Greenbone",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "7552383"
+	},
+	"item": [
+		{
+			"name": "Test Health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9119/health",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9119",
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Computer",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"mac_address\": \"112.456.789\",\n    \"computer_name\": \"20MacbookProM1\",\n    \"ip_address\": \"127.0.0.1\",\n    \"employee_abbreviation\": \"ULS\",\n    \"description\": \"some description about the ULS\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9119/computer/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9119",
+					"path": [
+						"computer",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Computer Allocation",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"computer_id\": \"01gtrjxkf5c5ab6pq8y4pqg16f\",\n    \"employee_abbreviation\": \"UOS\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9119/computer/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9119",
+					"path": [
+						"computer",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All computers",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9119/computer/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9119",
+					"path": [
+						"computer",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Computer",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9119/computer/01gtrjwp4h4pwp0e11az101dgw",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9119",
+					"path": [
+						"computer",
+						"01gtrjwp4h4pwp0e11az101dgw"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get computer by employee abbreviation",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9119/computer/employee/UOS",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9119",
+					"path": [
+						"computer",
+						"employee",
+						"UOS"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get computer by computer ID",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9119/computer/01gtrjxkf5c5ab6pq8y4pqg16f",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9119",
+					"path": [
+						"computer",
+						"01gtrjxkf5c5ab6pq8y4pqg16f"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

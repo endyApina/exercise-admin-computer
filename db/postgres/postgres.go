@@ -52,9 +52,9 @@ func (store *postgresStore) GetComputerByID(computerId string) (*models.Computer
 	return &computer, nil
 }
 
-func (store *postgresStore) GetComputersByEmployeeName(employeeName string) ([]*models.Computer, error) {
-	var allComputer []*models.Computer
-	err := store.postgresClient.Where("employee_abbreviation = ?", employeeName).Find(allComputer).Error
+func (store *postgresStore) GetComputersByEmployeeName(employeeName string) ([]models.Computer, error) {
+	var allComputer []models.Computer
+	err := store.postgresClient.Where("employee_abbreviation = ?", employeeName).Find(&allComputer).Error
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -62,14 +62,14 @@ func (store *postgresStore) GetComputersByEmployeeName(employeeName string) ([]*
 	return allComputer, nil
 }
 
-func (store *postgresStore) GetAllComputers() ([]*models.Computer, error) {
+func (store *postgresStore) GetAllComputers() ([]models.Computer, error) {
 	var allComputers []models.Computer
-	err := store.postgresClient.Find(allComputers).Error
+	err := store.postgresClient.Find(&allComputers).Error
 	if err != nil {
 		log.Println(err)
 		return nil, err
 	}
-	return []*models.Computer{}, nil
+	return allComputers, nil
 }
 
 func (store *postgresStore) UpdateComputer(computerData *models.Computer) error {
@@ -81,13 +81,13 @@ func (store *postgresStore) UpdateComputer(computerData *models.Computer) error 
 	return nil
 }
 
-func (store *postgresStore) DeleteComputer(computerId string) (*models.Computer, error) {
+func (store *postgresStore) DeleteComputer(computerId string) error {
 	err := store.postgresClient.Where("computer_id = ?", computerId).Delete(models.Computer{}).Error
 	if err != nil {
 		log.Println(err)
-		return nil, err
+		return err
 	}
-	return &models.Computer{}, nil
+	return nil
 }
 
 func (store *postgresStore) UnAssignComputer(computerId, employeeAbbreviation string) error {
@@ -100,7 +100,7 @@ func (store *postgresStore) UnAssignComputer(computerId, employeeAbbreviation st
 }
 
 func (store *postgresStore) UpdateComputerAllocation(computerId, employeeAbbreviation string) error {
-	err := store.postgresClient.Model(models.Computer{}).Where("computer_id = ?", computerId).Update("employee_abbreviation", employeeAbbreviation).Error
+	err := store.postgresClient.Model(&models.Computer{}).Where("computer_id = ?", computerId).Update("employee_abbreviation", employeeAbbreviation).Error
 	if err != nil {
 		log.Println(err)
 		return err

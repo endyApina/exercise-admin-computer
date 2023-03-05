@@ -30,6 +30,7 @@ func (handler *Handler) TestHealth(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *Handler) CreateComputer(w http.ResponseWriter, r *http.Request) {
+	log.Println("creating new computer data...")
 	//validate json header
 	err := handler.validateHeader(w, r)
 	if err != nil {
@@ -38,33 +39,47 @@ func (handler *Handler) CreateComputer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//parse data
-	var newComputer *models.Computer
-	newComputer.ComputerID = handler.idGenerator.Generate() //generate unique id for computer
+	requestBody := models.CreateComputerRequest{}
 
-	err = handler.parseData(r, newComputer)
+	err = handler.parseData(r, &requestBody)
 	if err != nil {
 		errorMessage := errors.New("could not parse data")
+		log.Println(err.Error())
 		handler.sendResponse(w, http.StatusBadRequest, errorMessage)
 		return
 	}
 
+	newComputer := models.Computer{
+		ComputerID:           handler.idGenerator.Generate(), //generate unique id for computer,
+		MacAddress:           requestBody.MacAddress,
+		ComputerName:         requestBody.ComputerName,
+		IPAddress:            requestBody.IPAddress,
+		EmployeeAbbreviation: requestBody.EmployeeAbbreviation,
+		Description:          requestBody.Description,
+	}
+	log.Println("storing db data...")
 	//store data in db
-	err = handler.store.CreateComputer(newComputer)
+	err = handler.store.CreateComputer(&newComputer)
 	if err != nil {
 		errorMessage := errors.New("error saving data in db")
+		log.Println(errorMessage.Error())
 		handler.sendResponse(w, http.StatusInternalServerError, errorMessage)
 		return
 	}
 
+	// log.Println("validating new creation...")
 	//validate no of computers for this user
 	allComputers, err := handler.store.GetComputersByEmployeeName(newComputer.EmployeeAbbreviation)
 	if err != nil {
 		errorMessage := errors.New("error getting all customer computer information")
+		log.Println(errorMessage)
 		handler.sendResponse(w, http.StatusInternalServerError, errorMessage)
 		return
 	}
 
-	if len(allComputers) >= 3 {
+	log.Println("new computer added successfully...")
+	if len(allComputers) > 2 {
+		log.Println("send notification")
 		go handler.handleNotifyExcessComputerAllocation(allComputers)
 	}
 
@@ -137,14 +152,14 @@ func (handler *Handler) DeleteComputerByComputerID(w http.ResponseWriter, r *htt
 	}
 
 	computerID := chi.URLParam(r, "computer_id")
-	allComputers, err := handler.store.DeleteComputer(computerID)
+	err = handler.store.DeleteComputer(computerID)
 	if err != nil {
 		errorMessage := errors.New("error getting all computer information")
 		handler.sendResponse(w, http.StatusInternalServerError, errorMessage)
 		return
 	}
 
-	handler.sendResponse(w, http.StatusOK, allComputers)
+	handler.sendResponse(w, http.StatusOK, "computer deleted successfully")
 }
 
 func (handler *Handler) UpdateComputerAllocation(w http.ResponseWriter, r *http.Request) {
@@ -156,9 +171,9 @@ func (handler *Handler) UpdateComputerAllocation(w http.ResponseWriter, r *http.
 	}
 
 	//parse data
-	var requestBody *models.UpdateComputerAllocationRequestBody
+	var requestBody models.UpdateComputerAllocationRequestBody
 
-	err = handler.parseData(r, requestBody)
+	err = handler.parseData(r, &requestBody)
 	if err != nil {
 		errorMessage := errors.New("could not parse data")
 		handler.sendResponse(w, http.StatusBadRequest, errorMessage)
@@ -202,7 +217,7 @@ func (handler *Handler) sendResponse(w http.ResponseWriter, statusCode int, body
 	}
 }
 
-func (handler *Handler) handleNotifyExcessComputerAllocation(computerData []*models.Computer) {
+func (handler *Handler) handleNotifyExcessComputerAllocation(computerData []models.Computer) {
 	//not implemented
 
 }
