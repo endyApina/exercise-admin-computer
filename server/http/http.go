@@ -3,6 +3,7 @@ package http
 import (
 	"github.com/endyApina/exercise-admin-computer/lib/idgenerator"
 
+	"github.com/endyApina/exercise-admin-computer/config"
 	"github.com/endyApina/exercise-admin-computer/db"
 	"github.com/endyApina/exercise-admin-computer/server/http/handlers"
 	"github.com/go-chi/chi"
@@ -10,7 +11,7 @@ import (
 	"github.com/rs/cors"
 )
 
-func MountServer(store db.DataStore, idGenerator idgenerator.IdGenerator) *chi.Mux {
+func MountServer(store db.DataStore, idGenerator idgenerator.IdGenerator, config *config.Secrets) *chi.Mux {
 	router := chi.NewRouter()
 
 	router.Use(cors.New(cors.Options{
@@ -23,7 +24,7 @@ func MountServer(store db.DataStore, idGenerator idgenerator.IdGenerator) *chi.M
 	router.Use(middleware.Logger)
 
 	///implement handlers
-	httpHandler := handlers.NewHttpHandler(store, idGenerator)
+	httpHandler := handlers.NewHttpHandler(store, idGenerator, config)
 
 	//health check
 	router.Get("/health", httpHandler.TestHealth)

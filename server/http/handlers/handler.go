@@ -1,11 +1,15 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
+	"time"
 
+	"github.com/endyApina/exercise-admin-computer/config"
 	"github.com/endyApina/exercise-admin-computer/db"
 	"github.com/endyApina/exercise-admin-computer/lib/idgenerator"
 	"github.com/endyApina/exercise-admin-computer/types/models"
@@ -15,12 +19,14 @@ import (
 type Handler struct {
 	store       db.DataStore
 	idGenerator idgenerator.IdGenerator
+	config      *config.Secrets
 }
 
-func NewHttpHandler(store db.DataStore, idGenerator idgenerator.IdGenerator) *Handler {
+func NewHttpHandler(store db.DataStore, idGenerator idgenerator.IdGenerator, config *config.Secrets) *Handler {
 	return &Handler{
 		store:       store,
 		idGenerator: idGenerator,
+		config:      config,
 	}
 }
 
@@ -46,6 +52,13 @@ func (handler *Handler) CreateComputer(w http.ResponseWriter, r *http.Request) {
 		errorMessage := errors.New("could not parse data")
 		log.Println(err.Error())
 		handler.sendResponse(w, http.StatusBadRequest, errorMessage)
+		return
+	}
+
+	err = validateRequest(&requestBody)
+	if err != nil {
+		log.Println(err.Error())
+		handler.sendResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -79,11 +92,31 @@ func (handler *Handler) CreateComputer(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("new computer added successfully...")
 	if len(allComputers) > 2 {
-		log.Println("send notification")
-		go handler.handleNotifyExcessComputerAllocation(allComputers)
+		err = handler.handleNotifyExcessComputerAllocation(newComputer)
+		if err != nil {
+			log.Println(err)
+			handler.sendResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
 	}
 
 	handler.sendResponse(w, http.StatusOK, "computer created successfully")
+}
+
+func validateRequest(requestBody *models.CreateComputerRequest) error {
+	if requestBody.MacAddress == "" {
+		return errors.New("mac address cannot be empty")
+	}
+	if requestBody.ComputerName == "" {
+		return errors.New("computer name cannot be empty")
+	}
+	if requestBody.EmployeeAbbreviation != "" && len(requestBody.EmployeeAbbreviation) > 3 {
+		return errors.New("employee abbreviation should not be more than 3 chars long ")
+	}
+	if requestBody.IPAddress == "" {
+		return errors.New("ip address cannot be empty")
+	}
+	return nil
 }
 
 func (handler *Handler) GetAllComputers(w http.ResponseWriter, r *http.Request) {
@@ -211,13 +244,59 @@ func (handler *Handler) sendResponse(w http.ResponseWriter, statusCode int, body
 	if body == nil {
 		return
 	}
-	err := json.NewEncoder(w).Encode(body)
+
+	responseBody := models.HttpResponseBody{
+		StatusCode: statusCode,
+		Body:       body,
+	}
+
+	err := json.NewEncoder(w).Encode(responseBody)
 	if err != nil {
 		log.Println("Could not parse body", err)
 	}
 }
 
-func (handler *Handler) handleNotifyExcessComputerAllocation(computerData []models.Computer) {
+func (handler *Handler) handleNotifyExcessComputerAllocation(computerData models.Computer) error {
+	log.Println("sending notification...")
+	if computerData.EmployeeAbbreviation == "" {
+		log.Println("error sending notification. missing employee information")
+		return errors.New("error sending notification. missing employee information")
+	}
 	//not implemented
+	newMessage := &models.NotificationRequestBody{
+		Level:                "warning",
+		EmployeeAbbreviation: computerData.EmployeeAbbreviation,
+		Message:              fmt.Sprintf("excess computer allocation to user: %s", computerData.EmployeeAbbreviation),
+	}
 
+	reqBody := new(bytes.Buffer)
+	json.NewEncoder(reqBody).Encode(newMessage)
+
+	headers := http.Header{
+		"Content-Type": []string{"application/json"},
+	}
+	httpRequest, err := http.NewRequest(http.MethodPost, handler.config.MessagingServiceURL, bytes.NewBuffer(reqBody.Bytes()))
+	if err != nil {
+		log.Println("error when sending message to message service")
+		log.Println(err.Error())
+		return err
+	}
+	httpRequest.Header = headers
+	//execute request
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+
+	resp, err := client.Do(httpRequest)
+	if err != nil {
+		log.Println("error making http call to messaging service")
+		return err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		log.Println(resp.StatusCode)
+		return errors.New("error making http call to messaging service")
+	}
+	log.Println("notification sent successfully to: ", handler.config.MessagingServiceURL)
+	return nil
 }

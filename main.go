@@ -30,7 +30,7 @@ func main() {
 	}
 
 	idGeneratorDependency := idgenerator.New()
-	httpRouter := httpServer.MountServer(store, idGeneratorDependency)
+	httpRouter := httpServer.MountServer(store, idGeneratorDependency, &config)
 
 	interruptHandler := make(chan os.Signal, 1)
 	signal.Notify(interruptHandler, syscall.SIGTERM, syscall.SIGINT)
