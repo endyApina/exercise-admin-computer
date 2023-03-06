@@ -31,4 +31,10 @@ To build the service run
 go build -o admin-computer
 ```
 
+Import postman collection
+
+```sh
+download && import Greenbone.postman_collection.json
+```
+
 Afterwards the service can be started with `./admin-computer`.
